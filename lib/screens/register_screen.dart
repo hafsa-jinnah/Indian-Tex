@@ -1,6 +1,6 @@
+// ignore_for_file: use_build_context_synchronousl
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
-import 'package:indian_tex/providers/shop_provider.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterScreen extends StatefulWidget {
   const RegisterScreen({super.key});
@@ -44,64 +44,99 @@ class _RegisterScreenState extends State<RegisterScreen> {
               TextFormField(
                 controller: nameCtrl,
                 decoration: const InputDecoration(labelText: 'Name'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter name' : null,
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Enter name'
+                    : null,
               ),
               const SizedBox(height: 10),
+
               TextFormField(
                 controller: emailCtrl,
                 decoration: const InputDecoration(labelText: 'Email'),
-                validator: (v) => (v == null || !v.contains('@')) ? 'Enter valid email' : null,
+                validator: (v) => (v == null || !v.contains('@'))
+                    ? 'Enter valid email'
+                    : null,
               ),
               const SizedBox(height: 10),
+
               TextFormField(
                 controller: phoneCtrl,
                 keyboardType: TextInputType.phone,
-                decoration: const InputDecoration(labelText: 'Telephone Number'),
-                validator: (v) => (v == null || v.trim().length < 8) ? 'Enter valid telephone' : null,
+                decoration:
+                    const InputDecoration(labelText: 'Telephone Number'),
+                validator: (v) => (v == null || v.trim().length < 8)
+                    ? 'Enter valid telephone'
+                    : null,
               ),
               const SizedBox(height: 10),
+
               TextFormField(
                 controller: addressCtrl,
                 minLines: 2,
                 maxLines: 3,
-                decoration: const InputDecoration(labelText: 'Home Address'),
-                validator: (v) => (v == null || v.trim().isEmpty) ? 'Enter home address' : null,
+                decoration:
+                    const InputDecoration(labelText: 'Home Address'),
+                validator: (v) => (v == null || v.trim().isEmpty)
+                    ? 'Enter home address'
+                    : null,
               ),
               const SizedBox(height: 10),
+
               TextFormField(
                 controller: passCtrl,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Create Password'),
-                validator: (v) => (v == null || v.length < 6) ? 'Min 6 chars' : null,
+                decoration:
+                    const InputDecoration(labelText: 'Create Password'),
+                validator: (v) => (v == null || v.length < 6)
+                    ? 'Min 6 chars'
+                    : null,
               ),
               const SizedBox(height: 10),
+
               TextFormField(
                 controller: confirmCtrl,
                 obscureText: true,
-                decoration: const InputDecoration(labelText: 'Confirm Password'),
-                validator: (v) => v != passCtrl.text ? 'Passwords do not match' : null,
+                decoration:
+                    const InputDecoration(labelText: 'Confirm Password'),
+                validator: (v) => v != passCtrl.text
+                    ? 'Passwords do not match'
+                    : null,
               ),
               const SizedBox(height: 14),
+
               ElevatedButton(
-                onPressed: () {
+                onPressed: () async {
                   if (formKey.currentState?.validate() ?? false) {
-                    final success = context.read<ShopProvider>().register(
-                          name: nameCtrl.text.trim(),
-                          email: emailCtrl.text.trim(),
-                          homeAddress: addressCtrl.text.trim(),
-                          telephone: phoneCtrl.text.trim(),
-                          password: passCtrl.text.trim(),
-                          confirmPassword: confirmCtrl.text.trim(),
-                        );
-                    if (!success) return;
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(content: Text('Successfully logged in')),
-                    );
-                    Navigator.pushNamedAndRemoveUntil(
-                      context,
-                      '/home',
-                      (route) => false,
-                    );
+                    try {
+                      await FirebaseAuth.instance
+                          .createUserWithEmailAndPassword(
+                        email: emailCtrl.text.trim(),
+                        password: passCtrl.text.trim(),
+                      );
+
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(
+                          content: Text('Account Created Successfully'),
+                        ),
+                      );
+
+                      Navigator.pushNamedAndRemoveUntil(
+                        context,
+                        '/home',
+                        (route) => false,
+                      );
+                    } on FirebaseAuthException catch (e) {
+                      if (!mounted) return;
+
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content:
+                              Text(e.message ?? 'Registration Failed'),
+                        ),
+                      );
+                    }
                   }
                 },
                 child: const Text('Create Account'),

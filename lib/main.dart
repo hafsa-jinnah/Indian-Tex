@@ -13,11 +13,13 @@ import 'package:indian_tex/screens/product_listing_screen.dart';
 import 'package:indian_tex/screens/profile_screen.dart';
 import 'package:indian_tex/screens/register_screen.dart';
 import 'package:firebase_core/firebase_core.dart';
-
+import 'firebase_options.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
+  await Firebase.initializeApp(
+     options: DefaultFirebaseOptions.currentPlatform,
+  );
   runApp(const IndianTexApp());
 }
 class IndianTexApp extends StatelessWidget {
