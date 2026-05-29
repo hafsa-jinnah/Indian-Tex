@@ -88,7 +88,7 @@ class ProductListingScreen extends StatelessWidget {
                             .toDouble(),
                     category: data['category'] ?? '',
                     description: data['description'] ?? '',
-                    imageUrl: data['image'] ?? '',
+                    imageUrl: data['imageUrl'] ?? '',
                     imageUrls: (data['imageUrls'] as List?)
                         ?.map((e) => e.toString())
                         .toList(),
